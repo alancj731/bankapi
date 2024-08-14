@@ -1,5 +1,6 @@
-import { Client, Account, ID } from 'node-appwrite';
-import { getAccount } from './appwrite-client';
+import { ID } from 'node-appwrite';
+import { getAdminAccount } from './appwrite-client';
+
 
 export interface AuthResponse {
   success: boolean;
@@ -11,14 +12,11 @@ export async function appWriteSignUp(
   email: string,
   password: string,
 ) {
-  // const client = getClient();
-  // const account = new Account(client);
-  const account = getAccount();
+  const account = getAdminAccount();
 
   try {
-    const response = await account.create(ID.unique(), email, password, name);
-    console.log('Sign up succeeded', response);
-    return { success: true, data: response.targets[0].userId }; // Adjust based on the response structure
+    const newUserAccount = await account.create(ID.unique(), email, password, name);
+    return { success: true, data: newUserAccount }; // Adjust based on the response structure
   } catch (error) {
     console.error('Sign up failed', error);
     return { success: false, data: error.message }; // Extract and return the error message
@@ -26,16 +24,13 @@ export async function appWriteSignUp(
 }
 
 export async function appWriteSignIn(email: string, password: string) {
-  // const client: Client = getClient();
-  // const account = new Account(client);
-  const account = getAccount();
+  const account = getAdminAccount();
 
   try {
     const response = await account.createEmailPasswordSession(email, password);
-    console.log('Sign in succeeded', response);
-    return { success: true, data: response.secret };
+    return { success: true, data: response };
   } catch (error) {
     console.error('Sign in failed', error);
-    return { success: false, data: error.message }; // Extract and return the error message
+    return { success: false, data: error.message };
   }
 }
